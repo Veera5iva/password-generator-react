@@ -7,6 +7,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig({
   plugins: [react()],
+  base: "/password-generator-react/",
   resolve: {
     alias: {
       '@': path.resolve(__dirname, 'src'), // Ensure this alias is pointing to 'src'
