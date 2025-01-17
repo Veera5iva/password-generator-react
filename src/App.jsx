@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import './App.css'
 import { DualRangeSlider } from './components/core/slider'
 
@@ -7,31 +7,55 @@ function App() {
    const [numberAllowed, setNumberAllowed] = useState(false)
    const [charAllowed, setCharAllowed] = useState(false)
    const [password, setPassword] = useState("")
-   console.log(length);
-   
 
+   const generatePassword = useCallback(() => {
+      let pass = "";
+      let str = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+      if(numberAllowed) str += "0123456789";
+      if(charAllowed) str += "!@#$%^&*()_+";
+
+      for(let i = 0; i < length; i++){
+         const index = Math.floor(Math.random() * str.length);
+         pass += str[index]
+      }
+      setPassword(pass)
+
+   }, [length, numberAllowed, charAllowed])
+
+   useEffect(() => {
+      generatePassword();
+   }, [length, numberAllowed, charAllowed, generatePassword])
+
+   const passwordRef = useRef(null)
+
+   const copyPassword = () => {
+      navigator.clipboard.writeText(password);
+      passwordRef.current?.select();
+   }
 
 
 
    return (
-      <div className='bg-slate-400 h-screen flex justify-center items-center'>
+      <div className='bg-gradient-to-r from-zinc-800 to-zinc-800 h-screen flex justify-center items-center text-white font-thin '>
 
-         <div className='h-[350px] w-[560px] bg-gray-500 rounded-xl flex items-center justify-center flex-col'>
-            <h1 className='text-2xl'>Password Generator</h1>
-            <div className='flex w-full justify-center items-center flex-row h-20 bg-orange-300 mt-3'>
+         <div className='h-[350px] w-[560px] rounded-xl flex items-center justify-center flex-col'>
+            <h1 className='text-3xl tracking-wider'>Password Generator</h1>
+            <div className='flex w-full justify-center items-center flex-row h-20 mt-3'>
                <input
-                  className="bg-zinc-200 text-zinc-600 font-mono ring-1 ring-zinc-400 focus:ring-2 focus:ring-rose-400 
-                  outline-none duration-300 placeholder:text-zinc-600 placeholder:opacity-50 rounded-full px-6 py-4 shadow-md focus:shadow-lg focus:shadow-rose-400 w-3/4 mr-3"
-                  disabled
+                  className="bg-zinc-200 text-zinc-600 font-mono ring-1 ring-zinc-400 focus:ring-2 focus:ring-orange-500 
+                  outline-none duration-300 placeholder:text-zinc-600 placeholder:opacity-50 rounded-full px-6 py-4 shadow-md focus:shadow-lg focus:shadow-orange-500 w-3/4 mr-3"
+                  readOnly
                   autoComplete="off"
                   placeholder="Password"
                   name="text"
                   type="text"
                   value={password}
+                  ref={passwordRef}
                />
                <div className="flex items-center justify-center">
                   <div className="relative group">
                      <button
+                        onClick={copyPassword}
                         className="relative inline-block p-px font-semibold leading-6 text-white bg-gray-800 shadow-2xl cursor-pointer rounded-xl shadow-zinc-900 transition-transform duration-300 ease-in-out hover:scale-105 active:scale-95"
                      >
                         <span
@@ -64,7 +88,8 @@ function App() {
                </div>
 
             </div>
-            <div className='bg-rose-900 w-full h-20 flex justify-center items-center gap-x-3'>
+
+            <div className='w-full h-20 flex justify-center items-center gap-x-3'>
                <h1 className='text-xl'>Length</h1>
 
                <DualRangeSlider
@@ -87,7 +112,7 @@ function App() {
                   className="relative inline-block h-8 w-14 cursor-pointer rounded-full bg-gray-300 transition [-webkit-tap-highlight-color:_transparent] has-[:checked]:bg-gray-900"
                >
                   <input
-                  onChange={(prev) => setNumberAllowed(!prev)}
+                  onChange={() => setNumberAllowed((prev) => !prev)}
                   className="peer sr-only" id="AcceptConditions" type="checkbox" />
                   <span
                      className="absolute inset-y-0 start-0 m-1 size-6 rounded-full bg-gray-300 ring-[6px] ring-inset ring-white transition-all peer-checked:start-8 peer-checked:w-2 peer-checked:bg-white peer-checked:ring-transparent"
@@ -103,14 +128,12 @@ function App() {
                   className="relative inline-block h-8 w-14 cursor-pointer rounded-full bg-gray-300 transition [-webkit-tap-highlight-color:_transparent] has-[:checked]:bg-gray-900"
                >
                   <input 
-                  onChange={(prev) => setCharAllowed(!prev)}
+                  onChange={() => setCharAllowed((prev) => !prev)}
                   className="peer sr-only" id="AcceptConditions" type="checkbox" />
                   <span
                      className="absolute inset-y-0 start-0 m-1 size-6 rounded-full bg-gray-300 ring-[6px] ring-inset ring-white transition-all peer-checked:start-8 peer-checked:w-2 peer-checked:bg-white peer-checked:ring-transparent"
                   ></span>
                </label>
-
-
 
             </div>
          </div>
